@@ -223,7 +223,9 @@ button {
   object-fit: cover;
 }
 .pic .emoji {
-  font-size: 60%;
+  /* Fill most of the tile — emoji glyphs carry their own padding, so ~92%
+     of the container size makes the icon large without clipping. */
+  font-size: 92%;
   line-height: 1;
 }
 
