@@ -83,7 +83,7 @@ export default function App() {
 
       <header className="topbar">
         <div className="brand">
-          <img src="/calendar-icon.svg" alt="" />
+          <img src={`${import.meta.env.BASE_URL}calendar-icon.svg`} alt="" />
           Picture Calendar
         </div>
 
