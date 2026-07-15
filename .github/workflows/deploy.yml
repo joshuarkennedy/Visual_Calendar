@@ -44,10 +44,9 @@ jobs:
         run: npm ci
 
       - name: Build
+        # The app builds with relative asset paths (see vite.config.ts), so it
+        # works under any Pages path without needing a base-path input.
         run: npm run build
-        env:
-          # Use the exact base path GitHub Pages serves this repo from.
-          VITE_BASE: ${{ steps.pages.outputs.base_path }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

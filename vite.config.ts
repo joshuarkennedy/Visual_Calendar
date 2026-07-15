@@ -3,20 +3,13 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig(({ command }) => {
-  // On GitHub Pages the app is served from https://<user>.github.io/<repo>/,
-  // so production assets need a base path. The CI passes the correct path via
-  // VITE_BASE (from actions/configure-pages); local dev stays at root.
-  const raw = process.env.VITE_BASE
-  const base = raw
-    ? raw.endsWith('/')
-      ? raw
-      : `${raw}/`
-    : command === 'build'
-      ? '/Visual_Calendar/'
-      : '/'
-
+  // Use RELATIVE asset paths for production builds ('./' instead of '/Repo/').
+  // This makes the built site work no matter what path it is served from on
+  // GitHub Pages (e.g. https://user.github.io/Visual_Calendar/), so it can
+  // never break due to a base-path or repo-name-casing mismatch. The app has
+  // no client-side router, so relative paths are completely safe here.
   return {
-    base,
+    base: command === 'build' ? './' : '/',
     plugins: [react()],
     server: {
       host: true,
