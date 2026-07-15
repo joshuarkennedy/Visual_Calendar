@@ -64,6 +64,11 @@ export interface Settings {
   clock24h: boolean
   /** High-contrast theme toggle. */
   highContrast: boolean
+  /**
+   * Speak a chime + the event's name aloud in the Viewer when an event
+   * becomes the current activity (and on the Speak button).
+   */
+  announceAloud: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -72,6 +77,7 @@ export const DEFAULT_SETTINGS: Settings = {
   dayEndHour: 21,
   clock24h: false,
   highContrast: false,
+  announceAloud: true,
 }
 
 /** The accessible, high-contrast color palette used across the app. */

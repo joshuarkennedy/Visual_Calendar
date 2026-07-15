@@ -1,10 +1,12 @@
+import { useEffect, useRef } from 'react'
 import { useApp } from '../context/AppContext'
 import type { CalendarEvent } from '../types'
 import { dayContext, eventsForDay } from '../utils/events'
 import { useNow } from '../utils/useNow'
-import { formatMinutes, MONTH_LABELS, WEEKDAY_LABELS } from '../utils/date'
+import { formatMinutes, isSameDay, MONTH_LABELS, WEEKDAY_LABELS } from '../utils/date'
 import { PictureThumb } from './PictureThumb'
 import { ColorBar, Countdown, MiniClock } from './TimingDisplays'
+import { announce, isSpeechSupported, stopSpeaking } from '../utils/speech'
 
 /**
  * The viewer screen for the person using the calendar: one big picture for
@@ -19,6 +21,28 @@ export function ViewerToday({ date }: { date: Date }) {
   const dayEvents = eventsForDay(events, date)
   const { current, next } = dayContext(dayEvents, nowM)
   const focus = current ?? next
+
+  const labelFor = (e: CalendarEvent) => e.title || getPicture(e.pictureId)?.name || 'Activity'
+
+  // Announce aloud when an event becomes the current activity ("pushed").
+  // Only for today, and only when the current event actually changes.
+  const announcedRef = useRef<string | null>(null)
+  const viewingToday = isSameDay(date, now)
+  useEffect(() => {
+    if (!viewingToday || !settings.announceAloud) {
+      announcedRef.current = current?.id ?? null
+      return
+    }
+    const id = current?.id ?? null
+    if (id && id !== announcedRef.current) {
+      announce(labelFor(current!))
+    }
+    announcedRef.current = id
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current?.id, viewingToday, settings.announceAloud])
+
+  // Stop any speech when leaving the viewer / unmounting.
+  useEffect(() => () => stopSpeaking(), [])
 
   const dateLabel = `${WEEKDAY_LABELS[date.getDay()]}, ${MONTH_LABELS[date.getMonth()]} ${date.getDate()}`
 
@@ -88,6 +112,7 @@ function FocusCard({
   const { getPicture, toggleDone, settings } = useApp()
   const picture = getPicture(event.pictureId)
   const endM = event.startMinutes + event.durationMinutes
+  const label = event.title || picture?.name || 'Activity'
 
   const timingProps = {
     startMinutes: event.startMinutes,
@@ -114,13 +139,24 @@ function FocusCard({
           {event.displayMode === 'clock' && <MiniClock {...timingProps} size={140} />}
         </div>
 
-        <button
-          className="btn primary done-btn"
-          onClick={() => toggleDone(event.id)}
-          style={{ ['--primary' as string]: event.color }}
-        >
-          {event.done ? '↩ Not done' : '✔ Done'}
-        </button>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            className="btn primary done-btn"
+            onClick={() => toggleDone(event.id)}
+            style={{ ['--primary' as string]: event.color }}
+          >
+            {event.done ? '↩ Not done' : '✔ Done'}
+          </button>
+          {isSpeechSupported() && (
+            <button
+              className="btn done-btn"
+              onClick={() => announce(label)}
+              aria-label={`Say ${label} aloud`}
+            >
+              🔊 Say it
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import { useApp } from '../context/AppContext'
 import type { DisplayMode } from '../types'
 import { Modal } from './Modal'
+import { announce, isSpeechSupported } from '../utils/speech'
 
 const DISPLAY_MODES: { mode: DisplayMode; label: string }[] = [
   { mode: 'colorbar', label: 'Color bar' },
@@ -39,6 +40,32 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <strong>Announce events aloud</strong>
+          <div className="hint">
+            {isSpeechSupported()
+              ? 'Chime + speak the event name in the Viewer when it becomes the current activity.'
+              : 'Spoken audio is not supported in this browser.'}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {settings.announceAloud && isSpeechSupported() && (
+            <button className="btn" onClick={() => announce('Brush teeth')}>
+              🔊 Test
+            </button>
+          )}
+          <button
+            className={`btn ${settings.announceAloud ? 'primary' : ''}`}
+            onClick={() => updateSettings({ announceAloud: !settings.announceAloud })}
+            aria-pressed={settings.announceAloud}
+            disabled={!isSpeechSupported()}
+          >
+            {settings.announceAloud ? 'On' : 'Off'}
+          </button>
+        </div>
       </div>
 
       <div className="settings-row">
