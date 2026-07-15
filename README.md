@@ -42,6 +42,20 @@ Color is a first-class property of every event, using a **12-color
 accessible palette**. There's also a **high-contrast theme** (black
 background, bold colors, thick borders) for low-vision users.
 
+### Reminders when a task "starts" (is pushed)
+When an event becomes the current activity, the app can:
+- **🔊 Speak it aloud** — a gentle chime, then the event's name spoken with the
+  browser's built-in Speech Synthesis (fully on-device, no network). A **Say it**
+  button replays it any time.
+- **Pulse the picture** — the big picture glows and shows a 🔊 badge while it's
+  being read, a clear visual cue (with a static-ring fallback under
+  reduced-motion, for deaf/hard-of-hearing and low-vision users).
+- **Show a notification** — an opt-in system pop-up (with the picture as its
+  icon) that reaches the person even when the app is in the background.
+
+Reminders fire from an always-mounted watcher, so they work whether the
+Viewer or the Caregiver view is open.
+
 ### Built for accessibility
 - Large touch targets (56px+), big type, works great on a **tablet**.
 - Full keyboard focus rings, ARIA labels/roles, `role="img"` pictures.
@@ -92,16 +106,20 @@ src/
     EventEditor.tsx         # create/edit a picture-event
     PicturePicker.tsx       # pick from the bank or upload
     PictureBankModal.tsx    # manage / upload / hide pictures
-    SettingsModal.tsx       # display mode, contrast, clock, day range
+    SettingsModal.tsx       # display mode, contrast, clock, day range, reminders
     TimingDisplays.tsx      # ColorBar / Countdown / MiniClock
+    Reminders.tsx           # always-on watcher: spoken + notification reminders
+  utils/speech.ts           # chime + speech synthesis + speaking-state store
+  utils/notify.ts           # system notifications + emoji-to-icon rendering
 ```
 
 ---
 
 ## 🗺️ Ideas for next steps
 
-- Sound / spoken labels when a task starts (audio cue alongside the picture).
 - "First–Then" board mode (a common special-education pattern).
 - Printable daily picture schedule.
 - Optional cloud sync / multi-device sharing between caregivers.
 - Drag-to-move and drag-to-resize events on the timeline.
+- A choice of voice / speaking speed for spoken labels.
+- A PWA service worker for true push while the app is fully closed.

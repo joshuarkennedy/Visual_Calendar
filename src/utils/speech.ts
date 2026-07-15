@@ -10,6 +10,24 @@ export function isSpeechSupported(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window
 }
 
+/* ---- speaking-state store (drives the "speaking" visual pulse) ---- */
+let speaking = false
+let fallbackTimer: number | undefined
+const speakingListeners = new Set<() => void>()
+
+export function getSpeaking(): boolean {
+  return speaking
+}
+export function subscribeSpeaking(fn: () => void): () => void {
+  speakingListeners.add(fn)
+  return () => speakingListeners.delete(fn)
+}
+function setSpeaking(v: boolean): void {
+  if (speaking === v) return
+  speaking = v
+  speakingListeners.forEach((l) => l())
+}
+
 function getCtx(): AudioContext | null {
   const Ctx =
     typeof window !== 'undefined'
@@ -59,8 +77,27 @@ export function speak(text: string, opts: { rate?: number; pitch?: number } = {}
     u.rate = opts.rate ?? 0.9 // a little slower aids comprehension
     u.pitch = opts.pitch ?? 1
     u.lang = 'en-US'
+
+    // Drive the speaking pulse. We flip it on optimistically and use an
+    // estimated duration as a fallback, because onstart/onend are flaky or
+    // absent on some browsers; the real events override the estimate.
+    setSpeaking(true)
+    window.clearTimeout(fallbackTimer)
+    const estMs = Math.min(9000, 700 + text.length * 85)
+    fallbackTimer = window.setTimeout(() => setSpeaking(false), estMs)
+    u.onstart = () => setSpeaking(true)
+    u.onend = () => {
+      window.clearTimeout(fallbackTimer)
+      setSpeaking(false)
+    }
+    u.onerror = () => {
+      window.clearTimeout(fallbackTimer)
+      setSpeaking(false)
+    }
+
     synth.speak(u)
   } catch {
+    setSpeaking(false)
     // ignore — speech is best-effort
   }
 }
@@ -77,6 +114,8 @@ export function announce(label: string, opts?: { rate?: number }): void {
 
 /** Stop any in-progress speech (e.g. when leaving the viewer). */
 export function stopSpeaking(): void {
+  window.clearTimeout(fallbackTimer)
+  setSpeaking(false)
   if (isSpeechSupported()) {
     try {
       window.speechSynthesis.cancel()

@@ -411,6 +411,56 @@ button {
   border: 4px solid var(--evt);
   font-size: 160px;
 }
+
+/* Speaking pulse — visual cue that the label is being read aloud. */
+.now-card .big-pic.speaking {
+  animation: speak-pulse 1.1s ease-in-out infinite;
+}
+@keyframes speak-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--evt) 60%, transparent);
+    transform: scale(1);
+  }
+  70% {
+    box-shadow: 0 0 0 22px color-mix(in srgb, var(--evt) 0%, transparent);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--evt) 0%, transparent);
+    transform: scale(1);
+  }
+}
+/* Animated "sound waves" badge on the picture while speaking. */
+.now-card {
+  position: relative;
+}
+.now-card.is-speaking::after {
+  content: '🔊';
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 28px;
+  background: var(--surface);
+  border: 2px solid var(--evt);
+  border-radius: 999px;
+  padding: 4px 8px;
+  animation: speak-badge 0.8s ease-in-out infinite;
+  z-index: 2;
+}
+@keyframes speak-badge {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Reduced-motion: keep a clear, non-animated cue instead of the pulse. */
+@media (prefers-reduced-motion: reduce) {
+  .now-card .big-pic.speaking {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--evt) 45%, transparent);
+  }
+  .now-card.is-speaking::after {
+    opacity: 1;
+  }
+}
 .now-card .now-info {
   display: flex;
   flex-direction: column;

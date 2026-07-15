@@ -69,6 +69,12 @@ export interface Settings {
    * becomes the current activity (and on the Speak button).
    */
   announceAloud: boolean
+  /**
+   * Show a system notification when an event becomes the current activity,
+   * so the reminder reaches the person even when the app isn't in focus.
+   * Requires the user to grant notification permission.
+   */
+  showNotifications: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -78,6 +84,7 @@ export const DEFAULT_SETTINGS: Settings = {
   clock24h: false,
   highContrast: false,
   announceAloud: true,
+  showNotifications: false,
 }
 
 /** The accessible, high-contrast color palette used across the app. */

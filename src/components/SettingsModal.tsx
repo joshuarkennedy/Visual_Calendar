@@ -1,7 +1,14 @@
+import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import type { DisplayMode } from '../types'
 import { Modal } from './Modal'
 import { announce, isSpeechSupported } from '../utils/speech'
+import {
+  notificationPermission,
+  notificationsSupported,
+  requestNotificationPermission,
+  showNotification,
+} from '../utils/notify'
 
 const DISPLAY_MODES: { mode: DisplayMode; label: string }[] = [
   { mode: 'colorbar', label: 'Color bar' },
@@ -11,6 +18,25 @@ const DISPLAY_MODES: { mode: DisplayMode; label: string }[] = [
 
 export function SettingsModal({ onClose }: { onClose: () => void }) {
   const { settings, updateSettings } = useApp()
+  const [perm, setPerm] = useState<NotificationPermission>(notificationPermission())
+
+  async function toggleNotifications() {
+    if (settings.showNotifications) {
+      updateSettings({ showNotifications: false })
+      return
+    }
+    let p = notificationPermission()
+    if (p === 'default') p = await requestNotificationPermission()
+    setPerm(p)
+    if (p === 'granted') {
+      updateSettings({ showNotifications: true })
+      showNotification('Notifications on', {
+        body: 'You will be reminded when it is time for an activity.',
+      })
+    } else {
+      updateSettings({ showNotifications: false })
+    }
+  }
 
   return (
     <Modal
@@ -66,6 +92,27 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             {settings.announceAloud ? 'On' : 'Off'}
           </button>
         </div>
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <strong>Show notifications</strong>
+          <div className="hint">
+            {!notificationsSupported()
+              ? 'Notifications are not supported in this browser.'
+              : perm === 'denied'
+                ? 'Blocked — allow notifications for this site in your browser settings.'
+                : 'A pop-up reminder when an activity starts, even if the app is in the background.'}
+          </div>
+        </div>
+        <button
+          className={`btn ${settings.showNotifications ? 'primary' : ''}`}
+          onClick={toggleNotifications}
+          aria-pressed={settings.showNotifications}
+          disabled={!notificationsSupported() || perm === 'denied'}
+        >
+          {settings.showNotifications ? 'On' : perm === 'default' ? 'Turn on' : 'Off'}
+        </button>
       </div>
 
       <div className="settings-row">

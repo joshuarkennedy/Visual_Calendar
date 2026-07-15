@@ -1,17 +1,18 @@
-import { useEffect, useRef } from 'react'
 import { useApp } from '../context/AppContext'
 import type { CalendarEvent } from '../types'
 import { dayContext, eventsForDay } from '../utils/events'
 import { useNow } from '../utils/useNow'
-import { formatMinutes, isSameDay, MONTH_LABELS, WEEKDAY_LABELS } from '../utils/date'
+import { formatMinutes, MONTH_LABELS, WEEKDAY_LABELS } from '../utils/date'
 import { PictureThumb } from './PictureThumb'
 import { ColorBar, Countdown, MiniClock } from './TimingDisplays'
-import { announce, isSpeechSupported, stopSpeaking } from '../utils/speech'
+import { announce, isSpeechSupported } from '../utils/speech'
+import { useSpeaking } from '../utils/useSpeaking'
 
 /**
  * The viewer screen for the person using the calendar: one big picture for
  * what's happening now, its timing shown as a color bar / countdown / clock,
- * and an "up next" strip. No reading required.
+ * and an "up next" strip. No reading required. Spoken/notification reminders
+ * are fired centrally by <Reminders/> so they work in any mode.
  */
 export function ViewerToday({ date }: { date: Date }) {
   const { events, getPicture, toggleDone, settings } = useApp()
@@ -21,28 +22,6 @@ export function ViewerToday({ date }: { date: Date }) {
   const dayEvents = eventsForDay(events, date)
   const { current, next } = dayContext(dayEvents, nowM)
   const focus = current ?? next
-
-  const labelFor = (e: CalendarEvent) => e.title || getPicture(e.pictureId)?.name || 'Activity'
-
-  // Announce aloud when an event becomes the current activity ("pushed").
-  // Only for today, and only when the current event actually changes.
-  const announcedRef = useRef<string | null>(null)
-  const viewingToday = isSameDay(date, now)
-  useEffect(() => {
-    if (!viewingToday || !settings.announceAloud) {
-      announcedRef.current = current?.id ?? null
-      return
-    }
-    const id = current?.id ?? null
-    if (id && id !== announcedRef.current) {
-      announce(labelFor(current!))
-    }
-    announcedRef.current = id
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current?.id, viewingToday, settings.announceAloud])
-
-  // Stop any speech when leaving the viewer / unmounting.
-  useEffect(() => () => stopSpeaking(), [])
 
   const dateLabel = `${WEEKDAY_LABELS[date.getDay()]}, ${MONTH_LABELS[date.getMonth()]} ${date.getDate()}`
 
@@ -113,6 +92,7 @@ function FocusCard({
   const picture = getPicture(event.pictureId)
   const endM = event.startMinutes + event.durationMinutes
   const label = event.title || picture?.name || 'Activity'
+  const speaking = useSpeaking()
 
   const timingProps = {
     startMinutes: event.startMinutes,
@@ -123,8 +103,8 @@ function FocusCard({
   }
 
   return (
-    <div className="now-card" style={{ ['--evt' as string]: event.color }}>
-      <PictureThumb picture={picture} className="big-pic" />
+    <div className={`now-card ${speaking ? 'is-speaking' : ''}`} style={{ ['--evt' as string]: event.color }}>
+      <PictureThumb picture={picture} className={`big-pic ${speaking ? 'speaking' : ''}`} />
       <div className="now-info">
         <div className="now-kicker">{isCurrent ? 'Now' : 'Next'}</div>
         <div className="now-title">{event.title || picture?.name || 'Event'}</div>

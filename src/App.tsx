@@ -8,6 +8,7 @@ import { ViewerToday } from './components/ViewerToday'
 import { EventEditor, type EditorDraft } from './components/EventEditor'
 import { PictureBankModal } from './components/PictureBankModal'
 import { SettingsModal } from './components/SettingsModal'
+import { Reminders } from './components/Reminders'
 
 type Mode = 'viewer' | 'caregiver'
 type CalView = 'month' | 'week' | 'day'
@@ -77,6 +78,9 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Always-on reminder watcher (spoken + notifications). */}
+      <Reminders />
+
       <header className="topbar">
         <div className="brand">
           <img src="/calendar-icon.svg" alt="" />
