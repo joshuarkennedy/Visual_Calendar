@@ -12,7 +12,18 @@
     <title>Picture Calendar</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback shown until the app's JavaScript loads and renders.
+           If you ever see this text stuck on screen, the app script failed
+           to load (rather than a truly blank page). -->
+      <div style="font-family: system-ui, sans-serif; text-align: center; padding: 48px 20px; color: #475569;">
+        <div style="font-size: 40px;">🗓️</div>
+        <p style="font-size: 20px; font-weight: 700;">Loading Picture Calendar…</p>
+        <noscript>
+          <p style="color: #dc2626;">This app needs JavaScript to be enabled in your browser.</p>
+        </noscript>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
