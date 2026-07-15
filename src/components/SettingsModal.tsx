@@ -117,6 +117,46 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
 
       <div className="settings-row">
         <div>
+          <strong>Viewer layout</strong>
+          <div className="hint">Lay the day out as a vertical list or a horizontal row.</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            className={`btn ${settings.viewerOrientation === 'horizontal' ? 'primary' : ''}`}
+            onClick={() => updateSettings({ viewerOrientation: 'horizontal' })}
+            aria-pressed={settings.viewerOrientation === 'horizontal'}
+          >
+            ↔ Horizontal
+          </button>
+          <button
+            className={`btn ${settings.viewerOrientation === 'vertical' ? 'primary' : ''}`}
+            onClick={() => updateSettings({ viewerOrientation: 'vertical' })}
+            aria-pressed={settings.viewerOrientation === 'vertical'}
+          >
+            ↕ Vertical
+          </button>
+        </div>
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <strong>Picture size</strong>
+          <div className="hint">How big the pictures appear in the Viewer.</div>
+        </div>
+        <select
+          value={settings.pictureSize}
+          onChange={(e) =>
+            updateSettings({ pictureSize: e.target.value as 'medium' | 'large' | 'huge' })
+          }
+        >
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+          <option value="huge">Huge</option>
+        </select>
+      </div>
+
+      <div className="settings-row">
+        <div>
           <strong>High-contrast mode</strong>
           <div className="hint">Black background, bold colors, thicker borders.</div>
         </div>

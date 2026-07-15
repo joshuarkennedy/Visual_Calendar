@@ -75,6 +75,10 @@ export interface Settings {
    * Requires the user to grant notification permission.
    */
   showNotifications: boolean
+  /** Lay the Viewer's day schedule out as a vertical list or horizontal row. */
+  viewerOrientation: 'vertical' | 'horizontal'
+  /** Relative size of pictures in the Viewer. */
+  pictureSize: 'medium' | 'large' | 'huge'
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -85,6 +89,8 @@ export const DEFAULT_SETTINGS: Settings = {
   highContrast: false,
   announceAloud: true,
   showNotifications: false,
+  viewerOrientation: 'horizontal',
+  pictureSize: 'large',
 }
 
 /** The accessible, high-contrast color palette used across the app. */

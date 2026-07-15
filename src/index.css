@@ -375,192 +375,326 @@ button {
   background: var(--danger);
 }
 
-/* ---------- Viewer (Today big screen) ---------- */
+/* ---------- Viewer (day display) ---------- */
 .viewer {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
+  /* Picture sizes (overridden by the pics-* modifier below). */
+  --hero-pic: 360px;
+  --card-pic: 170px;
 }
-.viewer-datebar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+.viewer.pics-medium {
+  --hero-pic: min(70vw, 260px);
+  --card-pic: 120px;
 }
-.viewer-date {
-  font-size: 28px;
-  font-weight: 800;
+.viewer.pics-large {
+  --hero-pic: min(80vw, 380px);
+  --card-pic: 175px;
 }
-.now-card {
-  background: var(--surface);
-  border: 3px solid var(--evt, var(--border));
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  padding: 22px;
-  display: grid;
-  grid-template-columns: minmax(180px, 320px) 1fr;
-  gap: 24px;
-  align-items: center;
-}
-.now-card .big-pic {
-  aspect-ratio: 1;
-  width: 100%;
-  border-radius: var(--radius);
-  border: 4px solid var(--evt);
-  font-size: 160px;
+.viewer.pics-huge {
+  --hero-pic: min(88vw, 540px);
+  --card-pic: 240px;
 }
 
-/* Speaking pulse — visual cue that the label is being read aloud. */
-.now-card .big-pic.speaking {
+.viewer-datebar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.viewer-date {
+  font-size: clamp(24px, 4vw, 40px);
+  font-weight: 800;
+}
+.viewer-clock {
+  font-size: clamp(24px, 4vw, 40px);
+  font-weight: 800;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Focus hero (now / next) ---- */
+.hero {
+  position: relative;
+  background: var(--surface);
+  border: 4px solid var(--evt, var(--border));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: clamp(16px, 3vw, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(20px, 4vw, 44px);
+  align-items: center;
+  justify-content: center;
+}
+.hero-pic {
+  width: var(--hero-pic);
+  height: var(--hero-pic);
+  flex: none;
+  border-radius: var(--radius);
+  border: 5px solid var(--evt);
+  font-size: var(--hero-pic);
+}
+.hero-info {
+  flex: 1 1 320px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.hero-kicker {
+  font-size: clamp(18px, 2.4vw, 26px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--evt);
+}
+.hero-title {
+  font-size: clamp(38px, 6vw, 76px);
+  font-weight: 800;
+  line-height: 1.02;
+}
+.hero-time {
+  font-size: clamp(20px, 2.6vw, 30px);
+  color: var(--text-muted);
+  font-weight: 700;
+}
+.hero-timing {
+  margin: 4px 0;
+}
+.hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.hero-btn {
+  font-size: clamp(20px, 2.4vw, 26px);
+  padding: 16px 30px;
+}
+.hero-empty {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 800;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 3px dashed var(--border-strong);
+  border-radius: var(--radius);
+}
+
+/* Speaking pulse on the hero picture. */
+.hero-pic.speaking {
   animation: speak-pulse 1.1s ease-in-out infinite;
 }
 @keyframes speak-pulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--evt) 60%, transparent);
-    transform: scale(1);
-  }
-  70% {
-    box-shadow: 0 0 0 22px color-mix(in srgb, var(--evt) 0%, transparent);
-    transform: scale(1.03);
-  }
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--evt) 0%, transparent);
-    transform: scale(1);
-  }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--evt) 60%, transparent); transform: scale(1); }
+  70% { box-shadow: 0 0 0 26px color-mix(in srgb, var(--evt) 0%, transparent); transform: scale(1.03); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--evt) 0%, transparent); transform: scale(1); }
 }
-/* Animated "sound waves" badge on the picture while speaking. */
-.now-card {
-  position: relative;
-}
-.now-card.is-speaking::after {
+.hero.is-speaking::after {
   content: '🔊';
   position: absolute;
-  top: 14px;
-  left: 14px;
-  font-size: 28px;
+  top: 16px;
+  left: 16px;
+  font-size: 30px;
   background: var(--surface);
   border: 2px solid var(--evt);
   border-radius: 999px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   animation: speak-badge 0.8s ease-in-out infinite;
   z-index: 2;
 }
 @keyframes speak-badge {
-  0%, 100% { opacity: 0.6; }
+  0%, 100% { opacity: 0.55; }
   50% { opacity: 1; }
 }
-
-/* Reduced-motion: keep a clear, non-animated cue instead of the pulse. */
 @media (prefers-reduced-motion: reduce) {
-  .now-card .big-pic.speaking {
-    box-shadow: 0 0 0 8px color-mix(in srgb, var(--evt) 45%, transparent);
-  }
-  .now-card.is-speaking::after {
-    opacity: 1;
-  }
-}
-.now-card .now-info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.now-kicker {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--evt);
-}
-.now-title {
-  font-size: 46px;
-  font-weight: 800;
-  line-height: 1.05;
-}
-.now-time {
-  font-size: 22px;
-  color: var(--text-muted);
-  font-weight: 700;
-}
-.now-empty {
-  text-align: center;
-  padding: 48px 20px;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-.done-btn {
-  align-self: flex-start;
-  font-size: 22px;
-  padding: 16px 26px;
+  .hero-pic.speaking { box-shadow: 0 0 0 10px color-mix(in srgb, var(--evt) 45%, transparent); }
+  .hero.is-speaking::after { opacity: 1; }
 }
 
-/* Timing displays */
-.colorbar-wrap {
-  height: 34px;
+/* ---- Timing displays (deliberately very different from each other) ---- */
+.td-caption {
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 800;
+  margin-top: 10px;
+}
+/* Color bar: a big draining bar */
+.td-colorbar .cbar-track {
+  height: clamp(40px, 6vw, 56px);
   border-radius: 999px;
   background: var(--surface-2);
-  border: 2px solid var(--border);
+  border: 3px solid var(--border-strong);
   overflow: hidden;
 }
-.colorbar-fill {
+.td-colorbar .cbar-fill {
   height: 100%;
-  background: var(--evt);
+  border-radius: 999px;
   transition: width 0.6s linear;
 }
-.countdown {
-  font-size: 40px;
+/* Countdown: a giant number */
+.td-countdown .cd-heading {
+  font-size: clamp(18px, 2.4vw, 26px);
   font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--evt);
-}
-.countdown small {
-  display: block;
-  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
-  font-weight: 700;
 }
-.mini-clock {
-  --size: 120px;
+.td-countdown .cd-number {
+  font-size: clamp(64px, 12vw, 120px);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.td-countdown .cd-unit {
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 800;
+  color: var(--text-muted);
+}
+/* Clock: analog face + caption already handled by .td-caption */
+.td-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
-/* Up next strip */
-.upnext h3 {
-  margin: 6px 2px;
-  font-size: 20px;
-}
-.upnext-row {
+/* ---- "Then next" ribbon (shown while an event is in progress) ---- */
+.then-next {
   display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-.upnext-item {
-  flex: none;
-  width: 150px;
+  align-items: center;
+  gap: 14px;
   background: var(--surface);
   border: 2px solid var(--border);
-  border-left: 10px solid var(--evt);
+  border-left: 12px solid var(--evt, var(--border-strong));
   border-radius: var(--radius-sm);
-  padding: 12px;
-  text-align: center;
+  padding: 12px 18px;
 }
-.upnext-item.done {
-  opacity: 0.45;
+.then-label {
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 16px;
 }
-.upnext-item .pic {
-  width: 100%;
-  aspect-ratio: 1;
+.then-pic {
+  width: 64px;
+  height: 64px;
   font-size: 64px;
-  margin-bottom: 8px;
+  flex: none;
 }
-.upnext-item .u-time {
+.then-title {
+  font-size: clamp(20px, 2.6vw, 28px);
   font-weight: 800;
 }
-.upnext-item .u-title {
-  font-size: 14px;
+.then-in {
+  margin-left: auto;
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 800;
+}
+
+/* ---- The whole-day track ---- */
+.day-heading {
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 800;
   color: var(--text-muted);
+  margin: 4px 2px -6px;
+}
+.day-track {
+  display: flex;
+  gap: 16px;
+}
+.day-track.horizontal {
+  flex-direction: row;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+.day-track.vertical {
+  flex-direction: column;
+}
+
+.day-card {
+  position: relative;
+  background: var(--surface);
+  border: 3px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  gap: 14px;
+  text-align: left;
+  box-shadow: var(--shadow);
+}
+/* Horizontal cards stack picture over text; vertical cards sit side by side. */
+.day-track.horizontal .day-card {
+  flex: none;
+  width: calc(var(--card-pic) + 28px);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.day-track.vertical .day-card {
+  flex-direction: row;
+  align-items: center;
+}
+.day-card .card-pic {
+  width: var(--card-pic);
+  height: var(--card-pic);
+  flex: none;
+  border-radius: var(--radius-sm);
+  border-left: 10px solid var(--evt);
+  font-size: var(--card-pic);
+}
+.day-card .card-time {
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 800;
+}
+.day-card .card-title {
+  font-size: clamp(15px, 1.8vw, 22px);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.card-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Card states */
+.day-card.now {
+  border-color: var(--evt);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--evt) 40%, transparent), var(--shadow-lg);
+}
+.day-card.done {
+  opacity: 0.5;
+}
+.card-badge {
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  background: var(--evt);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  z-index: 1;
+}
+.card-check {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 28px;
+  color: var(--success);
+  z-index: 1;
 }
 
 /* ---------- Modal ---------- */

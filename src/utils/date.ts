@@ -46,8 +46,9 @@ export function nowMinutes(d: Date = new Date()): number {
 
 /** Format minutes-from-midnight as a clock string. */
 export function formatMinutes(minutes: number, clock24h = false): string {
-  let h = Math.floor(minutes / 60) % 24
-  const m = minutes % 60
+  const whole = Math.floor(minutes)
+  let h = Math.floor(whole / 60) % 24
+  const m = whole % 60
   if (clock24h) {
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
   }
