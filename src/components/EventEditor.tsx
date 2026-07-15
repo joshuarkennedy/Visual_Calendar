@@ -19,7 +19,7 @@ const RECURRENCES: { value: Recurrence; label: string }[] = [
   { value: 'weekly', label: 'Every week' },
 ]
 
-const DURATIONS = [15, 30, 45, 60, 90, 120, 180, 240]
+const DURATIONS = [5, 10, 15, 30, 45, 60, 90, 120, 180, 240]
 
 function minutesToTimeInput(mins: number): string {
   const h = String(Math.floor(mins / 60)).padStart(2, '0')
