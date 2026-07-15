@@ -521,9 +521,26 @@ button {
 
 /* ---- Timing displays (deliberately very different from each other) ---- */
 .td-caption {
-  font-size: clamp(20px, 2.6vw, 30px);
-  font-weight: 800;
-  margin-top: 10px;
+  font-size: clamp(15px, 1.8vw, 20px);
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+/* Pie ("Time Timer") countdown */
+.td-pie {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.pie-timer {
+  display: block;
+  transition: none;
+}
+.pie-hint {
+  font-size: clamp(14px, 1.6vw, 18px);
+  font-weight: 700;
+  color: var(--text-muted);
 }
 /* Color bar: a big draining bar */
 .td-colorbar .cbar-track {
@@ -597,10 +614,16 @@ button {
   font-size: clamp(20px, 2.6vw, 28px);
   font-weight: 800;
 }
-.then-in {
+.then-viz {
   margin-left: auto;
-  font-size: clamp(20px, 2.6vw, 28px);
-  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.then-in {
+  font-size: clamp(15px, 1.8vw, 20px);
+  font-weight: 700;
+  color: var(--text-muted);
 }
 
 /* ---- The whole-day track ---- */

@@ -8,7 +8,7 @@ import { PictureThumb } from './PictureThumb'
 
 const DISPLAY_MODES: { mode: DisplayMode; label: string; icon: string }[] = [
   { mode: 'colorbar', label: 'Color bar', icon: '🟩' },
-  { mode: 'countdown', label: 'Countdown', icon: '⏳' },
+  { mode: 'countdown', label: 'Shrinking timer', icon: '⏲️' },
   { mode: 'clock', label: 'Clock', icon: '🕐' },
 ]
 

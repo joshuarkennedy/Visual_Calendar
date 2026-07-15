@@ -4,7 +4,7 @@ import { dayContext, eventsForDay } from '../utils/events'
 import { useNow } from '../utils/useNow'
 import { formatDuration, formatMinutes, MONTH_LABELS, WEEKDAY_LABELS } from '../utils/date'
 import { PictureThumb } from './PictureThumb'
-import { ColorBar, Countdown, MiniClock } from './TimingDisplays'
+import { ColorBar, Countdown, MiniClock, PieTimer } from './TimingDisplays'
 import { announce, isSpeechSupported } from '../utils/speech'
 import { useSpeaking } from '../utils/useSpeaking'
 
@@ -53,8 +53,15 @@ export function ViewerToday({ date }: { date: Date }) {
           <span className="then-label">Then next:</span>
           <PictureThumb picture={getPicture(afterCurrent.pictureId)} className="then-pic" />
           <span className="then-title">{labelFor(afterCurrent)}</span>
-          <span className="then-in" style={{ color: afterCurrent.color }}>
-            in {formatDuration(Math.max(0, Math.ceil(afterCurrent.startMinutes - nowM)))}
+          <span className="then-viz">
+            <PieTimer
+              fraction={Math.max(0, Math.min(1, (afterCurrent.startMinutes - nowM) / 60))}
+              color={afterCurrent.color}
+              size={52}
+            />
+            <span className="then-in">
+              in {formatDuration(Math.max(0, Math.ceil(afterCurrent.startMinutes - nowM)))}
+            </span>
           </span>
         </div>
       )}

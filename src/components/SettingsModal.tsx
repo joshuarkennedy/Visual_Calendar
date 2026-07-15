@@ -12,7 +12,7 @@ import {
 
 const DISPLAY_MODES: { mode: DisplayMode; label: string }[] = [
   { mode: 'colorbar', label: 'Color bar' },
-  { mode: 'countdown', label: 'Countdown' },
+  { mode: 'countdown', label: 'Shrinking timer' },
   { mode: 'clock', label: 'Clock' },
 ]
 

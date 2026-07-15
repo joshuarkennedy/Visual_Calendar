@@ -1,4 +1,4 @@
-import { formatDuration, formatMinutes } from '../utils/date'
+import { formatDuration } from '../utils/date'
 
 /**
  * The three viewer-facing ways to show "how long until / how much is left",
@@ -47,27 +47,89 @@ export function ColorBar(p: TimingProps) {
       >
         <div className="cbar-fill" style={{ width: `${t.remainingPct}%`, background: p.color }} />
       </div>
-      <div className="td-caption" style={{ color: p.color }}>
-        {label}
-      </div>
+      <div className="td-caption">{label}</div>
     </div>
   )
 }
 
-/** A giant number of minutes remaining. */
+/**
+ * A "Time Timer" pie disc: the colored slice shrinks to nothing as the moment
+ * arrives. Purely visual — no numbers to read. When the color is gone, it's
+ * time. For an upcoming event the disc counts down the wait (over a rolling
+ * window); for an event in progress it counts down what's left of it.
+ */
+export function PieTimer({
+  fraction,
+  color,
+  size = 220,
+}: {
+  fraction: number
+  color: string
+  size?: number
+}) {
+  const c = size / 2
+  const r = c - 8
+  const frac = Math.max(0, Math.min(1, fraction))
+
+  // Angle swept clockwise from 12 o'clock.
+  const angle = frac * 360
+  const a1 = (-90 + angle) * (Math.PI / 180)
+  const ex = c + r * Math.cos(a1)
+  const ey = c + r * Math.sin(a1)
+  const large = angle > 180 ? 1 : 0
+  const wedge =
+    frac >= 0.999
+      ? null // full circle drawn separately
+      : frac <= 0.001
+        ? ''
+        : `M ${c} ${c} L ${c} ${c - r} A ${r} ${r} 0 ${large} 1 ${ex} ${ey} Z`
+
+  return (
+    <svg width={size} height={size} className="pie-timer" role="img" aria-label="Time remaining">
+      <circle cx={c} cy={c} r={r} fill="var(--surface-2)" stroke="var(--border-strong)" strokeWidth={4} />
+      {/* remaining-time slice */}
+      {frac >= 0.999 ? (
+        <circle cx={c} cy={c} r={r} fill={color} />
+      ) : (
+        wedge && <path d={wedge} fill={color} />
+      )}
+      {/* tick marks around the face */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const a = (i * 30 - 90) * (Math.PI / 180)
+        return (
+          <circle
+            key={i}
+            cx={c + Math.cos(a) * (r - 6)}
+            cy={c + Math.sin(a) * (r - 6)}
+            r={size > 160 ? 3.5 : 2}
+            fill="var(--surface)"
+          />
+        )
+      })}
+      <circle cx={c} cy={c} r={r} fill="none" stroke="var(--border-strong)" strokeWidth={4} />
+    </svg>
+  )
+}
+
+/** How full the countdown disc is. Upcoming events drain over a rolling window. */
+function countdownFraction(p: TimingProps): number {
+  const t = timing(p)
+  if (t.started) return t.remainingPct / 100
+  // Upcoming: show a draining disc over the last WINDOW minutes before start,
+  // so the color visibly disappears as the moment gets close.
+  const WINDOW = 60
+  return Math.max(0, Math.min(1, (t.minsUntilStart) / WINDOW))
+}
+
 export function Countdown(p: TimingProps) {
   const t = timing(p)
   const mins = t.started ? t.minsLeft : t.minsUntilStart
-  const heading = t.started ? 'Time left' : 'Starts in'
-  const big = mins >= 60 ? formatDuration(mins) : String(mins)
-  const unit = mins >= 60 ? '' : mins === 1 ? 'minute' : 'minutes'
+  const label = t.started ? `${formatDuration(t.minsLeft)} left` : `starts in ${formatDuration(t.minsUntilStart)}`
   return (
-    <div className="td td-countdown" aria-label={`${heading} ${formatDuration(mins)}`}>
-      <div className="cd-heading">{heading}</div>
-      <div className="cd-number" style={{ color: p.color }}>
-        {big}
-        {unit && <span className="cd-unit">{unit}</span>}
-      </div>
+    <div className="td td-pie" aria-label={label}>
+      <PieTimer fraction={countdownFraction(p)} color={p.color} />
+      {/* Tiny caregiver-facing hint; the disc is the real signal. */}
+      <div className="pie-hint" aria-hidden>{mins <= 0 ? 'now' : formatDuration(mins)}</div>
     </div>
   )
 }
@@ -123,9 +185,7 @@ export function MiniClock(p: TimingProps & { size?: number }) {
         <line x1={c} y1={c} x2={m.x} y2={m.y} stroke={p.color} strokeWidth={5} strokeLinecap="round" />
         <circle cx={c} cy={c} r={7} fill="var(--text)" />
       </svg>
-      <div className="td-caption" style={{ color: p.color }}>
-        {label} · now {formatMinutes(p.nowMinutes, p.clock24h)}
-      </div>
+      <div className="td-caption">{label}</div>
     </div>
   )
 }
