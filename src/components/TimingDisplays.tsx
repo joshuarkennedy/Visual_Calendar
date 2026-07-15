@@ -112,24 +112,24 @@ export function PieTimer({
 }
 
 /** How full the countdown disc is. Upcoming events drain over a rolling window. */
+/** Minutes before an upcoming event over which the disc drains to empty. */
+export const COUNTDOWN_WINDOW = 30
+
 function countdownFraction(p: TimingProps): number {
   const t = timing(p)
   if (t.started) return t.remainingPct / 100
-  // Upcoming: show a draining disc over the last WINDOW minutes before start,
-  // so the color visibly disappears as the moment gets close.
-  const WINDOW = 60
-  return Math.max(0, Math.min(1, (t.minsUntilStart) / WINDOW))
+  // Upcoming: the disc only starts to appear/drain within the last WINDOW
+  // minutes, so a visible slice means "it's getting close".
+  return Math.max(0, Math.min(1, t.minsUntilStart / COUNTDOWN_WINDOW))
 }
 
 export function Countdown(p: TimingProps) {
   const t = timing(p)
-  const mins = t.started ? t.minsLeft : t.minsUntilStart
   const label = t.started ? `${formatDuration(t.minsLeft)} left` : `starts in ${formatDuration(t.minsUntilStart)}`
+  // Fully visual: the shrinking disc is the only signal, no numbers to read.
   return (
     <div className="td td-pie" aria-label={label}>
       <PieTimer fraction={countdownFraction(p)} color={p.color} />
-      {/* Tiny caregiver-facing hint; the disc is the real signal. */}
-      <div className="pie-hint" aria-hidden>{mins <= 0 ? 'now' : formatDuration(mins)}</div>
     </div>
   )
 }

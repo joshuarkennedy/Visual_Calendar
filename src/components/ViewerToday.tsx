@@ -2,9 +2,9 @@ import { useApp } from '../context/AppContext'
 import type { CalendarEvent } from '../types'
 import { dayContext, eventsForDay } from '../utils/events'
 import { useNow } from '../utils/useNow'
-import { formatDuration, formatMinutes, MONTH_LABELS, WEEKDAY_LABELS } from '../utils/date'
+import { formatMinutes, MONTH_LABELS, WEEKDAY_LABELS } from '../utils/date'
 import { PictureThumb } from './PictureThumb'
-import { ColorBar, Countdown, MiniClock, PieTimer } from './TimingDisplays'
+import { ColorBar, Countdown, COUNTDOWN_WINDOW, MiniClock, PieTimer } from './TimingDisplays'
 import { announce, isSpeechSupported } from '../utils/speech'
 import { useSpeaking } from '../utils/useSpeaking'
 
@@ -55,13 +55,10 @@ export function ViewerToday({ date }: { date: Date }) {
           <span className="then-title">{labelFor(afterCurrent)}</span>
           <span className="then-viz">
             <PieTimer
-              fraction={Math.max(0, Math.min(1, (afterCurrent.startMinutes - nowM) / 60))}
+              fraction={Math.max(0, Math.min(1, (afterCurrent.startMinutes - nowM) / COUNTDOWN_WINDOW))}
               color={afterCurrent.color}
-              size={52}
+              size={56}
             />
-            <span className="then-in">
-              in {formatDuration(Math.max(0, Math.ceil(afterCurrent.startMinutes - nowM)))}
-            </span>
           </span>
         </div>
       )}
